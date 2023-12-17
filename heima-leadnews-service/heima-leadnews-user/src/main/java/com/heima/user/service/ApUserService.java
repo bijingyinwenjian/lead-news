@@ -5,11 +5,13 @@ import com.heima.model.common.dtos.ResponseResult;
 import com.heima.model.user.dtos.LoginDto;
 import com.heima.model.user.pojos.ApUser;
 
-public interface ApUserService extends IService<ApUser> {
+public interface ApUserService extends IService<ApUser>{
+
     /**
-     * app端登录功能
+     * app端登录
      * @param dto
      * @return
      */
     public ResponseResult login(LoginDto dto);
+    
 }
