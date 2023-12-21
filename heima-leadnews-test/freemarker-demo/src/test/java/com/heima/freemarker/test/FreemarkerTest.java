@@ -31,7 +31,7 @@ public class FreemarkerTest {
         //合成
         //第一个参数 数据模型
         //第二个参数  输出流
-        template.process(params, new FileWriter("./list.html"));
+        template.process(params, new FileWriter("D:/list.html"));
     }
 
     private Map getData() {
