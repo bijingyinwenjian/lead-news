@@ -1,10 +1,8 @@
 server:
-  port: 51801
+  port: 51602
 spring:
-  profiles:
-    active: dev
   application:
-    name: leadnews-user
+    name: leadnews-wemedia-gateway
   cloud:
     nacos:
       discovery:
