@@ -17,17 +17,22 @@ public enum AppHttpCodeEnum {
     // 参数错误 500~1000
     PARAM_REQUIRE(500, "缺少参数"),
     PARAM_INVALID(501, "无效参数"),
+    NEWS_PUBLISH_DELETE_FAIL(501, "文章已发布，不能删除"),
+    NEWS_ID_REQUIRE(501, "文章Id不可缺少"),
+    NEWS_NO_PUBLISH(501, "文章不是发布状态，不能上下架"),
+    MATERIASL_REFERENCE_FAIL(501, "素材引用失效"),
+    MATERIASL_DELETE_FAIL(501, "文件删除失败"),
     PARAM_IMAGE_FORMAT_ERROR(502, "图片格式有误"),
     SERVER_ERROR(503, "服务器内部错误"),
     // 数据错误 1000~2000
     DATA_EXIST(1000, "数据已经存在"),
     AP_USER_DATA_NOT_EXIST(1001, "ApUser数据不存在"),
     DATA_NOT_EXIST(1002, "数据不存在"),
+    NEWS_NOT_EXIST(1002, "文章不存在"),
     // 数据错误 3000~3500
     NO_OPERATOR_AUTH(3000, "无权限操作"),
-    NEED_ADMIND(3001, "需要管理员权限"),
-    MATERIASL_REFERENCE_FAIL(501, "素材引用失效"),
-    MATERIASL_DELETE_FAIL(501, "文件删除失败");
+    NEED_ADMIND(3001, "需要管理员权限");
+
 
     int code;
     String errorMessage;

@@ -11,6 +11,7 @@ import com.heima.common.exception.CustomException;
 import com.heima.model.common.dtos.PageResponseResult;
 import com.heima.model.common.dtos.ResponseResult;
 import com.heima.model.common.enums.AppHttpCodeEnum;
+import com.heima.model.wemedia.dtos.WmNewsDownOrUpDto;
 import com.heima.model.wemedia.dtos.WmNewsDto;
 import com.heima.model.wemedia.dtos.WmNewsPageReqDto;
 import com.heima.model.wemedia.pojos.WmMaterial;
@@ -28,6 +29,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -149,6 +151,50 @@ public class WmNewsServiceImpl extends ServiceImpl<WmNewsMapper, WmNews> impleme
 
         return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
 
+    }
+
+    @Override
+    public ResponseResult one(Integer id) {
+        if (id == null){
+            return ResponseResult.errorResult(AppHttpCodeEnum.PARAM_INVALID);
+        }
+        WmNews wmNews = getById(id);
+        if (wmNews == null ){
+            return ResponseResult.errorResult(AppHttpCodeEnum.NEWS_NOT_EXIST);
+        }
+        return ResponseResult.okResult(wmNews);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public ResponseResult delNews(Integer id) {
+        if (id == null){
+            return ResponseResult.errorResult(AppHttpCodeEnum.NEWS_ID_REQUIRE);
+        }
+        WmNews wmNews = getById(id);
+        if (wmNews == null){
+            return ResponseResult.errorResult(AppHttpCodeEnum.NEWS_NOT_EXIST);
+        }
+        Assert.isTrue(!wmNews.getEnable().equals(WemediaConstants.WM_NEWS_UP),AppHttpCodeEnum.NEWS_PUBLISH_DELETE_FAIL.getErrorMessage());
+        // 删除文章以及他和素材的关联
+        removeById(id);
+        wmNewsMaterialMapper.delete(Wrappers.<WmNewsMaterial>lambdaQuery().eq(WmNewsMaterial::getNewsId,id));
+        return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
+    }
+
+    @Override
+    public ResponseResult downOrUp(WmNewsDownOrUpDto wmNewsDownOrUpDto) {
+        if (wmNewsDownOrUpDto.getId() == null){
+            return ResponseResult.errorResult(AppHttpCodeEnum.NEWS_ID_REQUIRE);
+        }
+        WmNews wmNews = getById(wmNewsDownOrUpDto.getId());
+        if (wmNews == null){
+            return ResponseResult.errorResult(AppHttpCodeEnum.NEWS_NOT_EXIST);
+        }
+        if (!wmNews.getStatus().equals(WmNews.Status.PUBLISHED.getCode())){
+            return ResponseResult.errorResult(AppHttpCodeEnum.NEWS_NO_PUBLISH);
+        }
+        return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
     }
 
     /**
