@@ -5,14 +5,17 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.heima.common.constants.WemediaConstants;
 import com.heima.file.service.FileStorageService;
 import com.heima.model.common.dtos.PageResponseResult;
 import com.heima.model.common.dtos.ResponseResult;
 import com.heima.model.common.enums.AppHttpCodeEnum;
 import com.heima.model.wemedia.dtos.WmMaterialDto;
 import com.heima.model.wemedia.pojos.WmMaterial;
+import com.heima.model.wemedia.pojos.WmNewsMaterial;
 import com.heima.utils.thread.WmThreadLocalUtil;
 import com.heima.wemedia.mapper.WmMaterialMapper;
+import com.heima.wemedia.mapper.WmNewsMaterialMapper;
 import com.heima.wemedia.service.WmMaterialService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.Date;
 import java.util.UUID;
@@ -32,6 +36,9 @@ public class WmMaterialServiceImpl extends ServiceImpl<WmMaterialMapper, WmMater
     @Autowired
     private FileStorageService fileStorageService;
 
+    @Resource
+    private WmNewsMaterialMapper wmNewsMaterialMapper;
+
     /**
      * 图片上传
      *
@@ -39,6 +46,7 @@ public class WmMaterialServiceImpl extends ServiceImpl<WmMaterialMapper, WmMater
      * @return
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public ResponseResult uploadPicture(MultipartFile multipartFile) {
 
         //1.检查参数
@@ -85,6 +93,52 @@ public class WmMaterialServiceImpl extends ServiceImpl<WmMaterialMapper, WmMater
         PageResponseResult pageResponseResult = new PageResponseResult(wmMaterialDto.getPage(), wmMaterialDto.getSize(), (int) page1.getTotal());
         pageResponseResult.setData(page1.getRecords());
         return pageResponseResult;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public ResponseResult delPicture(Integer id) {
+        if (id == null) {
+            return ResponseResult.errorResult(AppHttpCodeEnum.PARAM_INVALID);
+        }
+        WmMaterial material = getById(id);
+        if (material == null){
+            return ResponseResult.errorResult(AppHttpCodeEnum.DATA_NOT_EXIST);
+        }
+        try {
+            // 删除素材数据
+            removeById(id);
+            // 删除素材和文章关联
+            wmNewsMaterialMapper.delete(Wrappers.<WmNewsMaterial>lambdaQuery().eq(WmNewsMaterial::getMaterialId,id));
+            // 删除文件
+            fileStorageService.delete(material.getUrl());
+        } catch (Exception e) {
+            return ResponseResult.errorResult(AppHttpCodeEnum.MATERIASL_DELETE_FAIL);
+        }
+        return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
+    }
+
+    @Override
+    public ResponseResult cancelCollect(Integer id) {
+        WmMaterial wmMaterial = getById(id);
+        if (wmMaterial.getIsCollection().equals(WemediaConstants.CANCEL_COLLECT_MATERIAL)){
+            return ResponseResult.errorResult(AppHttpCodeEnum.PARAM_INVALID);
+        }
+        wmMaterial.setIsCollection(WemediaConstants.CANCEL_COLLECT_MATERIAL);
+        updateById(wmMaterial);
+        return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public ResponseResult collect(Integer id) {
+        WmMaterial wmMaterial = getById(id);
+        if (wmMaterial.getIsCollection().equals(WemediaConstants.COLLECT_MATERIAL)){
+            return ResponseResult.errorResult(AppHttpCodeEnum.PARAM_INVALID);
+        }
+        wmMaterial.setIsCollection(WemediaConstants.COLLECT_MATERIAL);
+        updateById(wmMaterial);
+        return ResponseResult.okResult(AppHttpCodeEnum.SUCCESS);
     }
 
 }
