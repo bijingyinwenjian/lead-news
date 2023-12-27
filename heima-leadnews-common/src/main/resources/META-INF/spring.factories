@@ -1,3 +1,7 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.heima.common.exception.ExceptionCatch,\
-  com.heima.common.knife4j.Swagger2Configuration
+  com.heima.common.knife4j.Swagger2Configuration,\
+  com.heima.common.aliyun.GreenImageScan,\
+  com.heima.common.aliyun.GreenTextScan,\
+  com.heima.common.tengxunyun.TextScan,\
+  com.heima.common.tengxunyun.ImageScan
