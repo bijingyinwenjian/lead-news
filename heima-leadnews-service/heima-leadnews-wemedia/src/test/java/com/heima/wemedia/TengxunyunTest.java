@@ -13,6 +13,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Map;
 
 @SpringBootTest(classes = WemediaApplication.class)
@@ -25,6 +26,9 @@ public class TengxunyunTest {
     @Resource
     private ImageScan imageScan;
 
+    @Resource
+    private FileStorageService fileStorageService;
+
     @Test
     public void testScanText() throws Exception {
         Map map = textScan.greenTextDetection("我是一个好人,冰毒");
@@ -33,7 +37,8 @@ public class TengxunyunTest {
 
     @Test
     public void testScanImage() throws Exception {
-        Map map = imageScan.asyncImageByUrl("http://111.230.204.58:9000/leadnews/2023/12/26/bf146d370a9f4ed38de7d688cd8bb8d8.png");
+        byte[] bytes = fileStorageService.downLoadFile("http://111.230.204.58:9000/leadnews/2023/12/26/89450da0549e4e119417ae44286d7466.png");
+        Map map = imageScan.asyncImage("http://111.230.204.58:5757/api/image/notice",bytes);
         System.out.println(map);
     }
 
