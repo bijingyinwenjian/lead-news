@@ -17,6 +17,7 @@ import com.tencentcloudapi.common.exception.TencentCloudSDKException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -45,6 +46,7 @@ public class WmNewsAutoScanServiceImpl implements WmNewsAutoScanService {
     private WmUserMapper wmUserMapper;
 
     @Override
+    @Async
     public void autoScanWmNews(Integer id) {
         //1.查询自媒体文章
         WmNews wmNews = wmNewsMapper.selectById(id);
@@ -56,8 +58,10 @@ public class WmNewsAutoScanServiceImpl implements WmNewsAutoScanService {
         if (!wmNews.getStatus().equals(WmNews.Status.PUBLISHED.getCode())) {
             //从内容中提取纯文本内容和图片
             Map<String, Object> resultMap = handleTextAndImages(wmNews);
+
             //2.审核文本内容
             String contents = resultMap.get("content").toString();
+
             if (!handleTextScan(contents, wmNews)) {
                 return;
             }

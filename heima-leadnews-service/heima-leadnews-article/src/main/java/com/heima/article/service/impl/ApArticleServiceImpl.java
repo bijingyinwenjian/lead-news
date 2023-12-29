@@ -6,6 +6,7 @@ import com.heima.article.mapper.ApArticleConfigMapper;
 import com.heima.article.mapper.ApArticleContentMapper;
 import com.heima.article.mapper.ApArticleMapper;
 import com.heima.article.service.ApArticleService;
+import com.heima.article.service.ArticleFreemarkerService;
 import com.heima.common.constants.ArticleConstants;
 import com.heima.model.article.dtos.ArticleDto;
 import com.heima.model.article.dtos.ArticleHomeDto;
@@ -33,6 +34,9 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
 
     @Resource
     private ApArticleConfigMapper apArticleConfigMapper;
+
+    @Resource
+    private ArticleFreemarkerService articleFreemarkerService;
 
     // 单页最大加载的数字
     private final static short MAX_PAGE_SIZE = 50;
@@ -101,6 +105,8 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
             apArticleContent.setContent(dto.getContent());
             apArticleContentMapper.insert(apArticleContent);
         }
+
+        articleFreemarkerService.buildArticleToMinIO(apArticle,dto.getContent());
         return ResponseResult.okResult(apArticle.getId());
     }
 }
