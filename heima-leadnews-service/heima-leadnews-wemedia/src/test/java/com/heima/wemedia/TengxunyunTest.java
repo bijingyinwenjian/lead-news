@@ -31,7 +31,8 @@ public class TengxunyunTest {
 
     @Test
     public void testScanText() throws Exception {
-        Map map = textScan.greenTextDetection("我是一个好人,冰毒");
+        Map map = textScan.greenTextDetection("我是一个好人,冰毒1");
+        System.out.println(map.get("Suggestion"));
         System.out.println(map);
     }
 
