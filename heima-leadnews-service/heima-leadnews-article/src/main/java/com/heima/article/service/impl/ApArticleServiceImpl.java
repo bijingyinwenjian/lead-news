@@ -85,7 +85,7 @@ public class ApArticleServiceImpl extends ServiceImpl<ApArticleMapper, ApArticle
             updateById(apArticle);
             ApArticleContent apArticleContent = apArticleContentMapper.selectOne(Wrappers.<ApArticleContent>lambdaQuery().eq(ApArticleContent::getArticleId, dto.getId()));
             apArticleContent.setContent(dto.getContent());
-            apArticleContentMapper.insert(apArticleContent);
+            apArticleContentMapper.updateById(apArticleContent);
         }else{
             BeanUtils.copyProperties(dto,apArticle);
             // 新增成功后会自动生成主键id
