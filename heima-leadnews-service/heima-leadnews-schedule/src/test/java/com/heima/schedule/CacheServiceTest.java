@@ -1,8 +1,11 @@
 package com.heima.schedule;
 
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.heima.common.redis.CacheService;
 import com.heima.model.schedule.dtos.Task;
+import com.heima.model.schedule.pojos.Taskinfo;
+import com.heima.schedule.mapper.TaskinfoMapper;
 import com.heima.schedule.service.TaskService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,7 +17,9 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 @SpringBootTest(classes = ScheduleApplication.class)
@@ -115,5 +120,18 @@ public class CacheServiceTest {
         String lock = cacheService.tryLock("1", System.currentTimeMillis());
         System.out.println(lock);
     }
+
+    @Resource
+    private TaskinfoMapper taskinfoMapper;
+
+    @Test
+    public void testPiple121() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.MINUTE,5);
+        System.out.println(calendar);
+        List<Taskinfo> allTasks = taskinfoMapper.selectList(Wrappers.<Taskinfo>lambdaQuery().lt(Taskinfo::getExecuteTime, calendar.getTime()));
+        System.out.println(allTasks);
+    }
+
 
 }
