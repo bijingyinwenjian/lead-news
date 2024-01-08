@@ -17,7 +17,7 @@ public class ApArticleConfigServiceImpl extends ServiceImpl<ApArticleConfigMappe
     @Override
     public void updateByMap(Map<String, Object> map) {
         Long articleId = (Long) map.get("articleId");
-        Short enable = (Short) map.get("enable");
+        Short enable = Short.parseShort(map.get("enable").toString());
         update(Wrappers.<ApArticleConfig>lambdaUpdate().set(ApArticleConfig::getIsDown, enable == 0).eq(ApArticleConfig::getArticleId, articleId));
     }
 }
