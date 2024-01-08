@@ -12,6 +12,7 @@ import com.heima.common.exception.CustomException;
 import com.heima.model.common.dtos.PageResponseResult;
 import com.heima.model.common.dtos.ResponseResult;
 import com.heima.model.common.enums.AppHttpCodeEnum;
+import com.heima.model.schedule.pojos.TaskinfoLogs;
 import com.heima.model.wemedia.dtos.WmNewsDownOrUpDto;
 import com.heima.model.wemedia.dtos.WmNewsDto;
 import com.heima.model.wemedia.dtos.WmNewsPageReqDto;
@@ -35,6 +36,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -191,7 +193,6 @@ public class WmNewsServiceImpl extends ServiceImpl<WmNewsMapper, WmNews> impleme
         if (wmNews == null) {
             return ResponseResult.errorResult(AppHttpCodeEnum.NEWS_NOT_EXIST);
         }
-        Assert.isTrue(!wmNews.getEnable().equals(WemediaConstants.WM_NEWS_UP), AppHttpCodeEnum.NEWS_PUBLISH_DELETE_FAIL.getErrorMessage());
         // 删除文章以及他和素材的关联
         removeById(id);
         wmNewsMaterialMapper.delete(Wrappers.<WmNewsMaterial>lambdaQuery().eq(WmNewsMaterial::getNewsId, id));

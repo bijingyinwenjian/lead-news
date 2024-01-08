@@ -141,6 +141,21 @@ public class TaskServiceImpl extends ServiceImpl<TaskinfoMapper, Taskinfo> imple
         }
     }
 
+    @PostConstruct
+    public void reloadData2(){
+        // 清理缓存数据
+        clearCache();
+        log.info("数据库同步数据到redis");
+        List<TaskinfoLogs> taskinfoLogsList = taskinfoLogsMapper.selectList(Wrappers.<TaskinfoLogs>lambdaQuery().eq(TaskinfoLogs::getStatus, ScheduleConstants.SCHEDULED));
+        if (taskinfoLogsList != null && taskinfoLogsList.size() > 0){
+            for (TaskinfoLogs taskinfoLogs : taskinfoLogsList) {
+                Task task = new Task();
+                BeanUtils.copyProperties(taskinfoLogs,task);
+                addTaskToCache(task);
+            }
+        }
+    }
+
     private void clearCache() {
         Set<String> futureKeys = cacheService.scan(ScheduleConstants.FUTURE + "*");
         Set<String> topicKeys = cacheService.scan(ScheduleConstants.TOPIC + "*");
@@ -161,7 +176,7 @@ public class TaskServiceImpl extends ServiceImpl<TaskinfoMapper, Taskinfo> imple
 
     //删除任务，更新日志
     private Task updateDb(long taskId, int executed) {
-        Task task = null;
+        Task task = new Task();
         try {
             removeById(taskId);
             TaskinfoLogs taskinfoLogs = taskinfoLogsMapper.selectById(taskId);
