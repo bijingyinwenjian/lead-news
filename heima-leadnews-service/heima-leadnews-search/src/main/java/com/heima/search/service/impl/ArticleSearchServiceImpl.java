@@ -57,6 +57,7 @@ public class ArticleSearchServiceImpl implements ArticleSearchService {
         highlightBuilder.postTags("</font>");
         searchSourceBuilder.highlighter(highlightBuilder);
 
+        searchSourceBuilder.query(boolQueryBuilder);
         searchRequest.source(searchSourceBuilder);
         SearchResponse searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
         ArrayList<Map> list = new ArrayList<>();
